@@ -1,15 +1,14 @@
 <?php
-const DB_HOST = 'mariadb';
-const DB_PORT = 3306;
-const DB_NAME = 'my_database';
-const DB_USER = 'username';
-const DB_PASSWORD = 'password';
 
-$dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+$config = require __DIR__ . '/config.php';
 
-$pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
+$dsn = "mysql:host={$config['db_host']};dbname={$config['db_name']};charset=utf8mb4";
 
-$sql = "SELECT * FROM my_table";
+$pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+]);
+
+$sql = "SELECT * FROM kitty";
 
 $stmt = $pdo->prepare($sql);
 
@@ -24,26 +23,31 @@ $results = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProgServ2 Course PHP Template</title>
+    <title>What's Your Kitty ?</title>
 </head>
 
 <body>
-    <h1>ProgServ2 Course PHP Template</h1>
+    <h1>What's Your Kitty ? 🎀</h1>
 
-    <p>Bienvenue dans votre projet PHP pour le cours ProgServ2 à la HEIG-VD !</p>
+    <p>Projet réalisé dans le cadre du cours ProgServ2 à la HEIG-VD.</p>
 
-    <h2>Résultats de la base de données :</h2>
+    <h2>Kitty disponibles :</h2>
 
-    <ul>
-        <?php foreach ($results as $row) { ?>
-            <li>ID: <?= htmlspecialchars($row['id']) ?>
-                <ul>
-                    <li>Column1: <?= htmlspecialchars($row['column1']) ?></li>
-                    <li>Column2: <?= htmlspecialchars($row['column2']) ?></li>
-                </ul>
-            </li>
-        <?php } ?>
-    </ul>
+    <?php if (empty($results)) { ?>
+        <p>Aucune Kitty trouvée dans la base de données.</p>
+    <?php } else { ?>
+        <ul>
+            <?php foreach ($results as $row) { ?>
+                <li>
+                    <ul>
+                        <?php foreach ($row as $column => $value) { ?>
+                            <li><?= htmlspecialchars($column) ?> : <?= htmlspecialchars((string) $value) ?></li>
+                        <?php } ?>
+                    </ul>
+                </li>
+            <?php } ?>
+        </ul>
+    <?php } ?>
 </body>
 
 </html>
