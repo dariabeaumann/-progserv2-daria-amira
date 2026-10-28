@@ -8,13 +8,9 @@ $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 ]);
 
-$sql = "SELECT * FROM kitty";
-
-$stmt = $pdo->prepare($sql);
-
+$stmt = $pdo->prepare("SELECT id_trait, nom_fr, nom_en FROM trait ORDER BY id_trait");
 $stmt->execute();
-
-$results = $stmt->fetchAll();
+$traits = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -31,23 +27,26 @@ $results = $stmt->fetchAll();
 
     <p>Projet réalisé dans le cadre du cours ProgServ2 à la HEIG-VD.</p>
 
-    <h2>Kitty disponibles :</h2>
+    <h2>Traits de personnalité</h2>
 
-    <?php if (empty($results)) { ?>
-        <p>Aucune Kitty trouvée dans la base de données.</p>
-    <?php } else { ?>
-        <ul>
-            <?php foreach ($results as $row) { ?>
-                <li>
-                    <ul>
-                        <?php foreach ($row as $column => $value) { ?>
-                            <li><?= htmlspecialchars($column) ?> : <?= htmlspecialchars((string) $value) ?></li>
-                        <?php } ?>
-                    </ul>
-                </li>
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Français</th>
+                <th>English</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($traits as $trait) { ?>
+                <tr>
+                    <td><?= htmlspecialchars((string) $trait['id_trait']) ?></td>
+                    <td><?= htmlspecialchars($trait['nom_fr']) ?></td>
+                    <td><?= htmlspecialchars($trait['nom_en']) ?></td>
+                </tr>
             <?php } ?>
-        </ul>
-    <?php } ?>
+        </tbody>
+    </table>
 </body>
 
 </html>
