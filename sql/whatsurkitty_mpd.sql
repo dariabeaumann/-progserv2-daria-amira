@@ -129,3 +129,11 @@ INSERT INTO trait (nom_fr, nom_en) VALUES
 ('Aventure', 'Adventure'),
 ('Calme', 'Calm');
 
+-- KITTY : jeu de données de départ (les illustrations SVG viendront plus tard)
+INSERT INTO kitty (nom_fr, nom_en, description_fr, description_en, illustration_svg, priorite_departage) VALUES
+('Boss Kitty', 'Boss Kitty', 'Ambitieuse et organisée, tu as toujours un plan.', 'Ambitious and organized, you always have a plan.', NULL, 1),
+('Kawaii Kitty', 'Kawaii Kitty', 'Douce et créative, tu mets de la couleur partout.', 'Sweet and creative, you add color everywhere.', NULL, 2),
+('Lazy Kitty', 'Lazy Kitty', 'Calme et tranquille, ton plaisir c''est le canapé.', 'Calm and relaxed, your happy place is the couch.', NULL, 3),
+('Gamer Kitty', 'Gamer Kitty', 'Stratège et passionnée, tu adores relever des défis.', 'Strategic and passionate, you love a good challenge.', NULL, 4),
+('Study Kitty', 'Study Kitty', 'Studieuse et curieuse, tu aimes apprendre et bien faire.', 'Studious and curious, you love learning and doing things right.', NULL, 5),
+('Travel Kitty', 'Travel Kitty', 'Aventurière et sociable, tu rêves déjà du prochain voyage.', 'Adventurous and sociable, you are already dreaming of the next trip.', NULL, 6);
