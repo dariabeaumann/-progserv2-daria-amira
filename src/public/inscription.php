@@ -57,7 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $erreurs[] = "Cette adresse e-mail est déjà utilisée.";
         } else {
             try {
-                $repository->creer($pseudo, $email, $motDePasse);
+                // On construit l'objet Utilisateur (pas encore enregistré : id et date = null)
+                // Le mot de passe est hashé ici : jamais enregistré en clair
+                $utilisateur = new Utilisateur(
+                    null,
+                    $pseudo,
+                    $email,
+                    password_hash($motDePasse, PASSWORD_DEFAULT),
+                    Utilisateur::ROLE_USER,
+                    'fr',
+                    null
+                );
+
+                // Le repository reçoit l'objet entier et l'enregistre
+                $repository->save($utilisateur);
+
                 $succes = true;
                 $pseudo = '';
                 $email = '';
