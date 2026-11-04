@@ -1,4 +1,5 @@
 -- Active: 1793188439955@@127.0.0.1@3306@my_database
+
 # HEIG-VD ProgServ2 Course PHP Template
 
 Ce modèle de projet est conçu pour les étudiant.es du cours
@@ -206,26 +207,82 @@ automatiquement arrêtés. Dès que vous rouvrez Visual Studio Code et que vous
 exécutez à nouveau la commande `docker compose up`, les services Docker seront
 redémarrés.
 
-
 ## Déploiement
 
 L'application est en ligne : https://whatsyourkitty.bike2fest.ch
 
-Hébergement : Infomaniak (hébergement Web PHP 8.4 et base MariaDB dédiée). Projet réalisé dans le cadre des études à la HEIG-VD (cours ProgServ2).
+Hébergement : Infomaniak (hébergement Web PHP 8.4 et base MariaDB dédiée).
+Projet réalisé dans le cadre des études à la HEIG-VD (cours ProgServ2).
 
-1. Créer un site PHP sur l'hébergement Infomaniak (Manager → Web & Domaines → ajouter un site).
+1. Créer un site PHP sur l'hébergement Infomaniak (Manager → Web & Domaines →
+   ajouter un site).
 2. Créer la base de données `4y02q2_kitty` (Manager → Bases de données).
-3. Créer un utilisateur de base avec droits de lecture et d'écriture sur cette base uniquement.
-4. Importer `sql/whatsurkitty_mpd.sql` dans la base avec phpMyAdmin (depuis la base, onglet Importer).
+3. Créer un utilisateur de base avec droits de lecture et d'écriture sur cette
+   base uniquement.
+4. Importer `sql/whatsurkitty_mpd.sql` dans la base avec phpMyAdmin (depuis la
+   base, onglet Importer).
 5. Téléverser le contenu de `src/public/` dans le dossier du site avec Web FTP.
-6. Créer sur le serveur un fichier `config.php` à partir de `config.example.php`, avec l'hôte `4y02q2.myd.infomaniak.com`, le nom de la base, l'utilisateur et son mot de passe. Ce fichier n'est jamais versionné (voir `.gitignore`).
+6. Créer sur le serveur un fichier `config.php` à partir de
+   `config.example.php`, avec l'hôte `4y02q2.myd.infomaniak.com`, le nom de la
+   base, l'utilisateur et son mot de passe. Ce fichier n'est jamais versionné
+   (voir `.gitignore`).
 
 ## Configuration locale
 
 1. Copier `src/public/config.example.php` en `src/public/config.php`.
-2. Y mettre les valeurs de l'environnement Docker (`mariadb`, `my_database`, `username`, `password`).
-3. Importer `sql/whatsurkitty_mpd.sql` dans la base locale avec phpMyAdmin (`http://localhost:9090`).
+2. Y mettre les valeurs de l'environnement Docker (`mariadb`, `my_database`,
+   `username`, `password`).
+3. Importer `sql/whatsurkitty_mpd.sql` dans la base locale avec phpMyAdmin
+   (`http://localhost:9090`).
 
 ## Utilisation d'outils d'IA
 
-Nous avons utilisé Claude (Anthropic) pour nous guider dans le déploiement sur Infomaniak (création de la base, import du schéma, envoi des fichiers) et pour la lecture du fichier `config.php` dans `index.php`. Nous avons compris et testé chaque étape.
+Nous avons utilisé Claude (Anthropic) pour nous guider dans le déploiement sur
+Infomaniak (création de la base, import du schéma, envoi des fichiers) et pour
+la lecture du fichier `config.php` dans `index.php`. Nous avons compris et testé
+chaque étape.
+
+## POO et sécurité
+
+### Programmation orientée objet
+
+Le code est organisé en classes dans `src/classes/`, chargées automatiquement
+par `src/autoload.php` (`spl_autoload_register`). Une classe = un fichier.
+
+| Classe                                                        | Rôle                                                                                               |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `Database`                                                    | Connexion PDO unique (attribut `private static`, constante `CHARSET`)                              |
+| `Kitty`, `TraitPersonnalite`, `Utilisateur`                   | Objets qui représentent une ligne de la base (attributs privés, constructeur, getters, constantes) |
+| `RepositoryInterface`                                         | Interface (contrat) : `findAll()` et `findById()`                                                  |
+| `KittyRepository`, `TraitRepository`, `UtilisateurRepository` | Lisent et écrivent dans la base, et implémentent `RepositoryInterface`                             |
+
+Notions utilisées : classes et objets, attributs et méthodes, encapsulation
+(`private` + getters), constructeurs, constantes de classe, interface,
+autoloading.
+
+### Sécurité
+
+- **Injection SQL** : toutes les requêtes sont préparées (`prepare` +
+  `bindValue`), voir les repositories.
+- **XSS** : toute donnée affichée passe par `htmlspecialchars`.
+- **Validation des saisies** (`src/public/inscription.php`) : pseudo, e-mail
+  (`filter_var`), longueur et confirmation du mot de passe.
+- **Mots de passe** : hashés avec `password_hash`, jamais enregistrés en clair.
+- **CSRF** : jeton de session vérifié avec `hash_equals` sur le formulaire.
+- **Secrets** : `config.php` (identifiants de la base) est dans `.gitignore`,
+  seul `config.example.php` est versionné.
+
+### Tester la sécurité
+
+- XSS : dans le formulaire d'inscription, saisir `<script>alert('XSS')</script>`
+  comme pseudo avec deux mots de passe différents. Le texte est affiché tel
+  quel, rien ne s'exécute.
+- Injection SQL : s'inscrire avec le pseudo `'); DROP TABLE utilisateur; --`. Il
+  est enregistré comme du texte, les tables restent intactes.
+
+### Utilisation de l'IA
+
+Nous avons utilisé Claude (Anthropic) comme aide pour structurer les classes,
+écrire les requêtes préparées et le formulaire d'inscription, et pour déboguer
+l'environnement Docker. Nous avons relu, testé et compris le code, et nous
+pouvons l'expliquer.
