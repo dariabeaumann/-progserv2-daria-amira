@@ -4,7 +4,7 @@
  * Va chercher les traits de personnalité dans la base de données.
  * Toutes les requêtes sont préparées (protection contre l'injection SQL).
  */
-class TraitRepository {
+class TraitRepository implements RepositoryInterface {
     private PDO $pdo;
 
     // Constructeur : on reçoit la connexion, ou on utilise celle de Database
