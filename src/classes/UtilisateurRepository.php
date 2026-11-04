@@ -60,20 +60,20 @@ class UtilisateurRepository implements RepositoryInterface {
     }
 
     /**
-     * Crée un utilisateur. Le mot de passe est hashé ici :
-     * le mot de passe en clair n'est JAMAIS enregistré.
+     * Enregistre un objet Utilisateur dans la base.
+     * L'objet contient déjà le mot de passe HASHÉ (jamais en clair).
      * Retourne l'id du nouvel utilisateur.
      */
-    public function creer(string $pseudo, string $email, string $motDePasseClair): int {
-        $hash = password_hash($motDePasseClair, PASSWORD_DEFAULT);
-
+    public function save(Utilisateur $utilisateur): int {
         $stmt = $this->pdo->prepare(
-            "INSERT INTO utilisateur (pseudo, email, mot_de_passe)
-             VALUES (:pseudo, :email, :mot_de_passe)"
+            "INSERT INTO utilisateur (pseudo, email, mot_de_passe, role, langue)
+             VALUES (:pseudo, :email, :mot_de_passe, :role, :langue)"
         );
-        $stmt->bindValue(':pseudo', $pseudo, PDO::PARAM_STR);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':mot_de_passe', $hash, PDO::PARAM_STR);
+        $stmt->bindValue(':pseudo', $utilisateur->getPseudo(), PDO::PARAM_STR);
+        $stmt->bindValue(':email', $utilisateur->getEmail(), PDO::PARAM_STR);
+        $stmt->bindValue(':mot_de_passe', $utilisateur->getMotDePasseHash(), PDO::PARAM_STR);
+        $stmt->bindValue(':role', $utilisateur->getRole(), PDO::PARAM_STR);
+        $stmt->bindValue(':langue', $utilisateur->getLangue(), PDO::PARAM_STR);
         $stmt->execute();
 
         return (int) $this->pdo->lastInsertId();

@@ -9,22 +9,22 @@ class Utilisateur {
     public const ROLE_ADMIN = 'admin';
 
     // Attributs privés (encapsulation)
-    private int $id;
+    private ?int $id; // null tant que l'utilisateur n'est pas enregistré
     private string $pseudo;
     private string $email;
     private string $motDePasseHash; // jamais le mot de passe en clair !
     private string $role;
     private string $langue;
-    private string $dateCreation;
+    private ?string $dateCreation; // null tant que l'utilisateur n'est pas enregistré
 
     public function __construct(
-        int $id,
+        ?int $id,
         string $pseudo,
         string $email,
         string $motDePasseHash,
         string $role,
         string $langue,
-        string $dateCreation
+        ?string $dateCreation
     ) {
         $this->id = $id;
         $this->pseudo = $pseudo;
@@ -36,7 +36,7 @@ class Utilisateur {
     }
 
     // Getters
-    public function getId(): int {
+    public function getId(): ?int {
         return $this->id;
     }
 
@@ -60,7 +60,7 @@ class Utilisateur {
         return $this->langue;
     }
 
-    public function getDateCreation(): string {
+    public function getDateCreation(): ?string {
         return $this->dateCreation;
     }
 
