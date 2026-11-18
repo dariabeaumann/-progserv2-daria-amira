@@ -22,7 +22,7 @@ $kitties = $repository->findAll();
 </head>
 
 <body>
-    <h1><?= $langue === 'en' ? 'All Kitties' : 'Toutes les Kitty' ?></h1>
+    <h1><?= htmlspecialchars($langue === 'en' ? 'All Kitties' : 'Toutes les Kitty') ?></h1>
 
     <p>
         <a href="?lang=fr">Français</a> |
@@ -30,7 +30,7 @@ $kitties = $repository->findAll();
     </p>
 
     <?php if (empty($kitties)): ?>
-        <p><?= $langue === 'en' ? 'No Kitty found.' : 'Aucune Kitty trouvée.' ?></p>
+        <p><?= htmlspecialchars($langue === 'en' ? 'No Kitty found.' : 'Aucune Kitty trouvée.') ?></p>
     <?php else: ?>
         <?php foreach ($kitties as $kitty): ?>
             <section>

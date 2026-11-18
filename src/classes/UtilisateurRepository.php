@@ -1,16 +1,14 @@
 <?php
 
-/**
- * Lit et enregistre les utilisateurs dans la base de données.
- * Toutes les requêtes sont préparées (protection contre l'injection SQL).
- */
+// Lit et enregistre les utilisateurs dans la base de données
 class UtilisateurRepository implements RepositoryInterface {
     private PDO $pdo;
 
-    public function __construct(?PDO $pdo = null) {
-        $this->pdo = $pdo ?? Database::getConnection();
+    public function __construct() {
+        $this->pdo = Database::getConnection();
     }
 
+    // Retourne un tableau d'objets Utilisateur
     public function findAll(): array {
         $stmt = $this->pdo->prepare(
             "SELECT id_utilisateur, pseudo, email, mot_de_passe, role, langue, date_creation
@@ -21,13 +19,22 @@ class UtilisateurRepository implements RepositoryInterface {
 
         $utilisateurs = [];
         foreach ($stmt->fetchAll() as $row) {
-            $utilisateurs[] = $this->creerUtilisateur($row);
+            $utilisateurs[] = new Utilisateur(
+                (int) $row['id_utilisateur'],
+                $row['pseudo'],
+                $row['email'],
+                $row['mot_de_passe'],
+                $row['role'],
+                $row['langue'],
+                $row['date_creation']
+            );
         }
 
         return $utilisateurs;
     }
 
-    public function findById(int $id): ?Utilisateur {
+    // Retourne l'utilisateur, ou null s'il n'existe pas
+    public function findById(int $id) {
         $stmt = $this->pdo->prepare(
             "SELECT id_utilisateur, pseudo, email, mot_de_passe, role, langue, date_creation
              FROM utilisateur
@@ -37,11 +44,23 @@ class UtilisateurRepository implements RepositoryInterface {
         $stmt->execute();
 
         $row = $stmt->fetch();
+        if ($row === false) {
+            return null;
+        }
 
-        return $row ? $this->creerUtilisateur($row) : null;
+        return new Utilisateur(
+            (int) $row['id_utilisateur'],
+            $row['pseudo'],
+            $row['email'],
+            $row['mot_de_passe'],
+            $row['role'],
+            $row['langue'],
+            $row['date_creation']
+        );
     }
 
-    public function findByEmail(string $email): ?Utilisateur {
+    // Retourne l'utilisateur, ou null s'il n'existe pas
+    public function findByEmail(string $email) {
         $stmt = $this->pdo->prepare(
             "SELECT id_utilisateur, pseudo, email, mot_de_passe, role, langue, date_creation
              FROM utilisateur
@@ -51,19 +70,28 @@ class UtilisateurRepository implements RepositoryInterface {
         $stmt->execute();
 
         $row = $stmt->fetch();
+        if ($row === false) {
+            return null;
+        }
 
-        return $row ? $this->creerUtilisateur($row) : null;
+        return new Utilisateur(
+            (int) $row['id_utilisateur'],
+            $row['pseudo'],
+            $row['email'],
+            $row['mot_de_passe'],
+            $row['role'],
+            $row['langue'],
+            $row['date_creation']
+        );
     }
 
+    // true si l'e-mail est déjà utilisé, sinon false
     public function emailExiste(string $email): bool {
         return $this->findByEmail($email) !== null;
     }
 
-    /**
-     * Enregistre un objet Utilisateur dans la base.
-     * L'objet contient déjà le mot de passe HASHÉ (jamais en clair).
-     * Retourne l'id du nouvel utilisateur.
-     */
+    // Enregistre un objet Utilisateur (le mot de passe est déjà haché)
+    // Retourne l'id du nouvel utilisateur
     public function save(Utilisateur $utilisateur): int {
         $stmt = $this->pdo->prepare(
             "INSERT INTO utilisateur (pseudo, email, mot_de_passe, role, langue)
@@ -77,18 +105,5 @@ class UtilisateurRepository implements RepositoryInterface {
         $stmt->execute();
 
         return (int) $this->pdo->lastInsertId();
-    }
-
-    // Transforme une ligne de la base en objet Utilisateur
-    private function creerUtilisateur(array $row): Utilisateur {
-        return new Utilisateur(
-            (int) $row['id_utilisateur'],
-            $row['pseudo'],
-            $row['email'],
-            $row['mot_de_passe'],
-            $row['role'],
-            $row['langue'],
-            $row['date_creation']
-        );
     }
 }

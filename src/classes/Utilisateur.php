@@ -1,30 +1,28 @@
 <?php
 
-/**
- * Représente un utilisateur (une ligne de la table `utilisateur`).
- */
+// Un utilisateur de l'application (une ligne de la table utilisateur)
 class Utilisateur {
-    // Constantes : les deux rôles possibles dans l'application
+    // Les deux rôles possibles
     public const ROLE_USER = 'user';
     public const ROLE_ADMIN = 'admin';
 
-    // Attributs privés (encapsulation)
-    private ?int $id; // null tant que l'utilisateur n'est pas enregistré
+    private int $id;
     private string $pseudo;
     private string $email;
-    private string $motDePasseHash; // jamais le mot de passe en clair !
+    private string $motDePasseHash;
     private string $role;
     private string $langue;
-    private ?string $dateCreation; // null tant que l'utilisateur n'est pas enregistré
+    private string $dateCreation;
 
+    // Pour un nouvel utilisateur pas encore enregistré : id = 0 et dateCreation = ''
     public function __construct(
-        ?int $id,
+        int $id,
         string $pseudo,
         string $email,
         string $motDePasseHash,
         string $role,
         string $langue,
-        ?string $dateCreation
+        string $dateCreation
     ) {
         $this->id = $id;
         $this->pseudo = $pseudo;
@@ -35,8 +33,7 @@ class Utilisateur {
         $this->dateCreation = $dateCreation;
     }
 
-    // Getters
-    public function getId(): ?int {
+    public function getId(): int {
         return $this->id;
     }
 
@@ -60,7 +57,7 @@ class Utilisateur {
         return $this->langue;
     }
 
-    public function getDateCreation(): ?string {
+    public function getDateCreation(): string {
         return $this->dateCreation;
     }
 
