@@ -4,12 +4,12 @@ require_once __DIR__ . '/../autoload.php';
 
 session_start();
 
-// Constantes : règles de validation
+// Règles de validation
 const PSEUDO_MIN = 2;
 const PSEUDO_MAX = 50;
 const EMAIL_MAX = 100;
 const MOT_DE_PASSE_MIN = 8;
-const MOT_DE_PASSE_MAX = 72; // limite de l'algorithme de hash
+const MOT_DE_PASSE_MAX = 72;
 
 // Jeton CSRF : prouve que le formulaire vient bien de notre site
 if (empty($_SESSION['csrf_token'])) {
@@ -22,7 +22,7 @@ $email = '';
 $succes = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // On ne fait jamais confiance aux saisies : on les récupère, puis on les valide
+    // On ne fait pas confiance aux saisies : on les récupère, puis on les vérifie
     $jeton = (string) ($_POST['csrf_token'] ?? '');
     $pseudo = trim((string) ($_POST['pseudo'] ?? ''));
     $email = trim((string) ($_POST['email'] ?? ''));
@@ -57,16 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $erreurs[] = "Cette adresse e-mail est déjà utilisée.";
         } else {
             try {
-                // On construit l'objet Utilisateur (pas encore enregistré : id et date = null)
-                // Le mot de passe est hashé ici : jamais enregistré en clair
+                // On crée l'objet Utilisateur (pas encore enregistré : id = 0 et date = '')
+                // Le mot de passe est haché ici, il n'est jamais enregistré en clair
                 $utilisateur = new Utilisateur(
-                    null,
+                    0,
                     $pseudo,
                     $email,
                     password_hash($motDePasse, PASSWORD_DEFAULT),
                     Utilisateur::ROLE_USER,
                     'fr',
-                    null
+                    ''
                 );
 
                 // Le repository reçoit l'objet entier et l'enregistre
